@@ -90,4 +90,3 @@ def adjust_color(color, amount):
 def style():
     css = generate_random_css()
     return Response(css, mimetype='text/css')
-

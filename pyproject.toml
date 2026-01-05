@@ -1,0 +1,15 @@
+[project]
+name = "sb-random-css"
+version = "0.1.0"
+description = "Random CSS Generator"
+requires-python = ">=3.9"
+dependencies = [
+    "flask>=3.0.0",
+]
+
+[build-system]
+requires = ["flask"]
+build-backend = "flask.cli:main"
+
+[tool.vercel]
+entrypoint = "api/style:app"
