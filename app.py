@@ -1,56 +1,103 @@
-@import "https://fonts.googleapis.com/css2?family=Kaisei+HarunoUmi&display=swap";
-body {
- 	font-family:"Kaisei HarunoUmi", serif;
-}
+from flask import Flask, render_template, Response
+import random
 
-.editor,
-.grid li,
-.list li.page-list-item,
-.stream {
-	font-family: inherit;
-}
-body{background:#04140f;}
-.page{background:#031108}
-.navbar-default{background:transparent}
-.search-form .form-group input{background:#34191b26}
-.new-button,.btn-search,.telomere{display:none !important}
-.page-menu .tool-btn{color:#3c2913c2}
-.grid li.page-list-item a{background:transparent}
-.brand-icon{opacity:.1}
-.navbar .navbar-brand .kamon-caret-down{width:0}
-.kamon-caret-down:before{content:none}
-.grid li.page-list-item a{background:transparent}
-.dropdown.user-menu-dropdown > a > img{animation: fa-spin .8s infinite linear ;opacity:.1}
-.dropdown.user-menu-dropdown > a > img:hover{animation:none}
-.grid li.page-list-item a .header{border:none}
-.status-bar>div{border:none;background:transparent}
-.grid li.page-list-item.pin{display:none}
-.grid li.page-list-item a .description{
-    writing-mode: vertical-rl;
- 		font-size:9px;
-		line-height:17px:
-}
-.grid li.page-list-item a .header{text-align:right}
-.grid li.page-list-item a {border: #34413d solid 0.5px;border-radius: 5px;}
-.quick-launch .flex-box,div.toolbar{opacity:.1}
-.quick-launch .flex-box:hover,div.toolbar:hover{opacity:1}
-.search-form .form-group input:focus, .search-form .form-group input.for-mobile {
-    color: #ffbb22;
+app = Flask(__name__)
+
+# パステルカラーパレット
+PASTEL_COLORS = [
+    "#FFD1DC", "#FFB3BA", "#FF9AA2", "#FF8598", "#FF768E",
+    "#FFDAC1", "#FFC3A0", "#FFAB91", "#FF9980", "#FF8A65",
+    "#E2F0CB", "#C8E6C9", "#A5D6A7", "#81C784", "#66BB6A",
+    "#B3E5FC", "#81D4FA", "#4FC3F7", "#29B6F6", "#03A9F4",
+    "#E1BEE7", "#CE93D8", "#BA68C8", "#AB47BC", "#9C27B0",
+    "#F0F4C3", "#E6EE9C", "#DCE775", "#D4E157", "#CDDC39",
+]
+
+# フォントリスト
+FONTS = [
+    "'Kaisei HarunoUmi', serif",
+    "'Noto Sans JP', sans-serif",
+    "'M PLUS Rounded 1c', sans-serif",
+    "'Sawarabi Mincho', sans-serif",
+    "'Hannari', sans-serif",
+]
+
+# ランダムなCSSを生成
+def generate_random_css():
+    bg_color = random.choice(PASTEL_COLORS)
+    text_color = random.choice(PASTEL_COLORS)
+    border_color = random.choice(PASTEL_COLORS)
+    font_family = random.choice(FONTS)
+    font_size = random.randint(8, 14)
+    line_height = random.randint(15, 25)
+    border_radius = random.randint(3, 10)
+    opacity = round(random.uniform(0.1, 0.9), 1)
+
+    css = f"""@import url("https://fonts.googleapis.com/css2?family=Kaisei+HarunoUmi&family=Hannari&family=M+PLUS+Rounded+1c&family=Noto+Sans+JP&family=Sawarabi+Mincho&display=swap");
+body {{
+    font-family: {font_family};
+    background: #{bg_color[1:]};
+}}
+.page {{
+    background: #{adjust_color(bg_color, -10)[1:]}
+}}
+.search-form .form-group input {{
+    background: #{adjust_color(bg_color, 20)[1:]}26;
+    color: #{text_color[1:]};
+}}
+.search-form .form-group input:focus, .search-form .form-group input.for-mobile {{
+    color: #{text_color[1:]};
     background-color: #00000040;
-}
-.dropdown-menu{color:#ffbb22;background:#070618d4}
-.dropdown-menu>li>a{color:#ffbb22}
-.dropdown-menu>li>a:active, [data-hover-visible] .dropdown-menu>li>a:hover, [data-focus-visible] .dropdown-menu>li>a:focus {
-    background-color: #b96318bd;
-}
+}}
+.dropdown-menu {{
+    color: #{text_color[1:]};
+    background: #{adjust_color(bg_color, -50)[1:]}d4;
+}}
+.dropdown-menu>li>a {{
+    color: #{text_color[1:]};
+}}
+.dropdown-menu>li>a:active, [data-hover-visible] .dropdown-menu>li>a:hover, [data-focus-visible] .dropdown-menu>li>a:focus {{
+    background-color: #{adjust_color(text_color, -30)[1:]}bd;
+}}
 .line.line-title .text,
 .grid li.page-list-item a .title,
-span.title{color:#ffbb22}
-li.relation-label.links{display:none}
-.dropdown-menu .divider{background:#e5e5e524}
-.page-list-item .description .link{text-decoration:none} 
+span.title {{
+    color: #{text_color[1:]};
+}}
+.grid li.page-list-item a .description {{
+    writing-mode: vertical-rl;
+    font-size: {font_size}px;
+    line-height: {line_height}px;
+}}
+.grid li.page-list-item a {{
+    border: #{adjust_color(border_color, 20)[1:]} solid 0.5px;
+    border-radius: {border_radius}px;
+}}
+.quick-launch .flex-box, div.toolbar {{
+    opacity: {opacity};
+}}
+.dropdown.user-menu-dropdown > a > img {{
+    opacity: {opacity};
+    animation: fa-spin 0.8s infinite linear;
+}}
+"""
+    return css
 
+# 16進数カラーを調整
+def adjust_color(color, amount):
+    color = color.lstrip('#')
+    rgb = tuple(int(color[i:i+2], 16) for i in (0, 2, 4))
+    new_rgb = tuple(max(0, min(255, c + amount)) for c in rgb)
+    return '#{:02x}{:02x}{:02x}'.format(*new_rgb)
 
+@app.route('/')
+def index():
+    return render_template('index.html')
 
+@app.route('/style.css')
+def style():
+    css = generate_random_css()
+    return Response(css, mimetype='text/css')
 
-
+if __name__ == '__main__':
+    app.run(debug=True)
