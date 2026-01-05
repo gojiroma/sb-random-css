@@ -10,6 +10,3 @@ dependencies = [
 [build-system]
 requires = ["flask"]
 build-backend = "flask.cli:main"
-
-[tool.vercel]
-entrypoint = "api/style:app"

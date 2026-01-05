@@ -2,14 +2,14 @@
     "version": 2,
     "builds": [
         {
-            "src": "api/style.py",
+            "src": "api/main.py",
             "use": "@vercel/python"
         }
     ],
     "routes": [
         {
             "src": "/api/style.css",
-            "dest": "api/style.py"
+            "dest": "api/main.py"
         },
         {
             "src": "/(.*)",
