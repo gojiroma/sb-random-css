@@ -1,9 +1,8 @@
-from flask import Flask, render_template, Response
+from flask import Flask, Response
 import random
 
 app = Flask(__name__)
 
-# パステルカラーパレット
 PASTEL_COLORS = [
     "#FFD1DC", "#FFB3BA", "#FF9AA2", "#FF8598", "#FF768E",
     "#FFDAC1", "#FFC3A0", "#FFAB91", "#FF9980", "#FF8A65",
@@ -13,7 +12,6 @@ PASTEL_COLORS = [
     "#F0F4C3", "#E6EE9C", "#DCE775", "#D4E157", "#CDDC39",
 ]
 
-# フォントリスト
 FONTS = [
     "'Kaisei HarunoUmi', serif",
     "'Noto Sans JP', sans-serif",
@@ -22,7 +20,6 @@ FONTS = [
     "'Hannari', sans-serif",
 ]
 
-# ランダムなCSSを生成
 def generate_random_css():
     bg_color = random.choice(PASTEL_COLORS)
     text_color = random.choice(PASTEL_COLORS)
@@ -83,21 +80,14 @@ span.title {{
 """
     return css
 
-# 16進数カラーを調整
 def adjust_color(color, amount):
     color = color.lstrip('#')
     rgb = tuple(int(color[i:i+2], 16) for i in (0, 2, 4))
     new_rgb = tuple(max(0, min(255, c + amount)) for c in rgb)
     return '#{:02x}{:02x}{:02x}'.format(*new_rgb)
 
-@app.route('/')
-def index():
-    return render_template('index.html')
-
-@app.route('/style.css')
+@app.route('/api/style.css')
 def style():
     css = generate_random_css()
     return Response(css, mimetype='text/css')
 
-if __name__ == '__main__':
-    app.run(debug=True)
